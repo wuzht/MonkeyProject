@@ -1,3 +1,9 @@
+10-monkey-species/
+logs/
+tblogs/
+trained_model/
+confusions/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
