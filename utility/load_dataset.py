@@ -12,18 +12,24 @@ import torch.utils.data as Data
 import torchvision
 import torchvision.transforms as transforms
 from PIL import Image
-import settings
-# sys.path.append('../')
 
 class_path = ["n0", "n1", "n2", "n3", "n4", 
             "n5", "n6", "n7", "n8", "n9"]
+
+base_path = {
+    "train": "./10-monkey-species/training/",
+    "validation": "./10-monkey-species/validation/"
+}
+
+json_path = './labels.json'
+
 
 def _init_json():
     dataset = {"train":[], "validation":[]}
 
     # 训练集
     for i in range(len(class_path)):
-        img_dir = settings.base_path["train"] + class_path[i]
+        img_dir = base_path["train"] + class_path[i]
         for img_name in os.listdir(img_dir): # 对于每一种猴子
             # check the file type
             file_type = os.path.splitext(img_name)[1]
@@ -37,7 +43,7 @@ def _init_json():
     
     # 验证集
     for i in range(len(class_path)):
-        img_dir = settings.base_path["validation"] + class_path[i]
+        img_dir = base_path["validation"] + class_path[i]
         for img_name in os.listdir(img_dir):  # 对于每一种猴子
             # check the file type
             file_type = os.path.splitext(img_name)[1]
@@ -49,7 +55,7 @@ def _init_json():
                                      "label": i})
 
     # 写入json
-    with open(settings.json_path, 'w') as json_file:
+    with open(json_path, 'w') as json_file:
         json_file.write(json.dumps(dataset))
 
 
@@ -59,10 +65,10 @@ def get_mean_std():
     '''
     number = [[],[],[]]
 
-    if not os.path.exists(settings.json_path):
+    if not os.path.exists(json_path):
         _init_json()
 
-    with open(settings.json_path) as json_file:
+    with open(json_path) as json_file:
         dataset = json.load(json_file)['train']
 
     rgb_sum  = torch.zeros((3))
@@ -101,10 +107,10 @@ def get_shotest_size():
     '''
     min_size = 1024 # 最短边
 
-    if not os.path.exists(settings.json_path):
+    if not os.path.exists(json_path):
         _init_json()
 
-    with open(settings.json_path) as json_file:
+    with open(json_path) as json_file:
         dataset = json.load(json_file)['train']
 
     for i in range(len(dataset)):
@@ -124,10 +130,10 @@ class MonkeyDataset(Data.Dataset):
     def __init__(self, train=True, transform=None):
         # set the paths of the images
         # assert len(imgs) == len(labels)
-        if not os.path.exists(settings.json_path):
+        if not os.path.exists(json_path):
             _init_json()
 
-        with open(settings.json_path) as json_file:
+        with open(json_path) as json_file:
             if train:
                 self.dataset = json.load(json_file)['train']
             else:
@@ -160,34 +166,3 @@ class MonkeyDataset(Data.Dataset):
 
 if __name__ == "__main__":
     _init_json()
-    #get_mean_std()
-
-    # dataset_mean = [0.4334, 0.4296, 0.3319]
-    # dataset_std = [0.2636, 0.2597, 0.2610]
-
-    # # define transform operations of train dataset
-    # train_transform = transforms.Compose([
-    #     # data augmentation
-    #     transforms.RandomHorizontalFlip(),
-    #     transforms.RandomRotation(degrees=20),
-    #     #transforms.RandomCrop(224),
-    #     transforms.ToTensor(),
-    #     transforms.Normalize(
-    #         mean=dataset_mean,
-    #         std=dataset_std
-    #     )])
-
-    # test_transform = transforms.Compose([
-    #     transforms.ToTensor(),
-    #     transforms.Normalize(
-    #         mean=dataset_mean,
-    #         std=dataset_std
-    #     )])
-
-    # train_dataset = MonkeyDataset(train=True, transform=train_transform)
-    # test_dataset = MonkeyDataset(train=False, transform=test_transform)
-
-    # #return train_dataset, test_dataset
-    # print(train_dataset.__getitem__(10))
-
-    # get_mean_std()

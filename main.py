@@ -33,6 +33,19 @@ GPU_NOT_USE = [1, 3, 4]
 # utility.load_dataset._init_json()   # print the paths and labels in json
 # utility.load_dataset.get_mean_std()
 # exit(-1)
+
+# create folders
+if not os.path.exists(settings.DIR_trained_model):
+    os.makedirs(settings.DIR_trained_model)
+if not os.path.exists(settings.DIR_logs):
+    os.makedirs(settings.DIR_logs)
+if not os.path.exists(settings.DIR_tblogs):
+    os.makedirs(settings.DIR_tblogs)
+if not os.path.exists(settings.DIR_confusions):
+    os.makedirs(settings.DIR_confusions)    
+if not os.path.exists(settings.DIR_confusion):
+    os.makedirs(settings.DIR_confusion)
+
 def choose_gpu():
     """
     return the id of the gpu with the most memory
@@ -56,8 +69,10 @@ device = torch.device('cuda:{}'.format(choose_gpu()))
 
 # Hyper parameters
 batch_size = 64
-num_epochs = 100 # 50 100 150 200
+num_epochs = 200 # 50 100 150 200
 lr = 0.0001
+lr_decay_type = None
+# lr_decay_type = 'linear'
 num_classes = 10
 momentum = 0.9
 weight_decay = 4e-5
@@ -68,13 +83,22 @@ train_transform = transforms.Compose([
     transforms.Resize(size=(224, 224)),
     transforms.RandomHorizontalFlip(),
     transforms.RandomVerticalFlip(),
-    # transforms.ColorJitter(),
-    #transforms.RandomCrop(224),
+    transforms.ToTensor(),
+    normalize
+]) if settings.isPretrain else transforms.Compose([
+    transforms.RandomResizedCrop(224),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomVerticalFlip(),
     transforms.ToTensor(),
     normalize
 ])
 val_transform = transforms.Compose([
     transforms.Resize(size=(224, 224)),
+    transforms.ToTensor(),
+    normalize
+]) if settings.isPretrain else transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
     transforms.ToTensor(),
     normalize
 ])
@@ -97,13 +121,16 @@ def get_model(_model_name, _num_classes):
 
 
 model = get_model(settings.model_name, num_classes)
-# optimizer = torch.optim.SGD(params=model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
-optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+optimizer = None
+if lr_decay_type == None:
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+else:
+    optimizer = torch.optim.SGD(params=model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
 loss_func = torch.nn.CrossEntropyLoss()
-
 
 log.logger.critical("Preset parameters:")
 log.logger.info('model_name: {}'.format(settings.model_name))
+log.logger.info('isPretrain: {}'.format(settings.isPretrain))
 log.logger.info('num_classes: {}'.format(num_classes))
 log.logger.info('device: {}'.format(device))
 log.logger.critical("Hyper parameters:")
@@ -113,12 +140,10 @@ log.logger.info('lr: {}'.format(lr))
 
 log.logger.critical("train_transform: \n{}".format(train_transform))
 log.logger.critical("val_transform: \n{}".format(val_transform))
-
 log.logger.critical("optimizer: \n{}".format(optimizer))
 log.logger.critical("loss_func: \n{}".format(loss_func))
 log.logger.critical("model: \n{}".format(model))
     
 log.logger.critical('Start training')
-# exit(-1)
-utility.fitting.fit(model, num_epochs, optimizer, loss_func, device, train_loader, val_loader, num_classes)
-
+utility.fitting.fit(model, num_epochs, optimizer, loss_func, device, train_loader, val_loader, num_classes, lr_decay_type)
+log.logger.critical('Train finished')

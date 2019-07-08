@@ -93,7 +93,8 @@ def train(model, train_loader, loss_func, optimizer, device):
     pbar.finish()
 
 
-def fit(model, num_epochs, optimizer, loss_func, device, train_loader, val_loader, num_classes):
+def fit(model, num_epochs, optimizer, loss_func, device, train_loader, val_loader, num_classes, lr_decay_type):
+    base_lr = optimizer.param_groups[0]['lr']
     best_val_acc = 0
     best_epoch = 0
     model.to(device)
@@ -180,16 +181,12 @@ def fit(model, num_epochs, optimizer, loss_func, device, train_loader, val_loade
         ######### tensorboard #########
 
         # lr decay
-        # if lr_decay_type == "linear":
-        #     # linear-decay learning rate policy (decreased from lr to 0)
-        #     for param_group in optimizer.param_groups:
-        #         param_group['lr'] -= lr_decay_rate
+        if lr_decay_type == "linear":
+            # linear-decay learning rate policy (decreased from base_lr to 0)
+            for param_group in optimizer.param_groups:
+                param_group['lr'] -= base_lr / num_epochs
         # elif lr_decay_type == "divide":
         #     if (epoch + 1) % lr_decay_period == 0:
         #         for param_group in optimizer.param_groups:
         #             param_group['lr'] /= lr_decay_rate
-        # else:
-        #     cur_lr = get_lr(global_step, total_step_num)
-        #     for param_group in optimizer.param_groups:
-        #         param_group['lr'] = cur_lr
         
