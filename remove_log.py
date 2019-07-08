@@ -31,7 +31,6 @@ def remove_specific_logs(names):
                 print(e)
                 
 
-
 def remove_all_logs():
     import settings
     commands = [
@@ -47,7 +46,6 @@ def remove_all_logs():
         except Exception as e:
             print(e)
             
-
 
 def main(argv):
     if len(argv) < 1:

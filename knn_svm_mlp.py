@@ -131,7 +131,7 @@ def perform_knn():
 def perform_svm():
     train_images, train_labels, val_images, val_labels = load_data()
     # kernel must be one of 'linear', 'poly', 'rbf', 'sigmoid'
-    clf = svm.SVC(gamma='scale', verbose=True, kernel='sigmoid')
+    clf = svm.SVC(gamma='scale', verbose=True, kernel='rbf')
     log.logger.critical("model: \n{}".format(clf))
     clf = fitting(clf, train_images, train_labels)
     acc = evaluate(clf, val_images, val_labels, num_classes=10)
@@ -139,7 +139,7 @@ def perform_svm():
 
 def perform_mlp():
     train_images, train_labels, val_images, val_labels = load_data()
-    clf = MLPClassifier(hidden_layer_sizes=(100, 200, 100), verbose=True)
+    clf = MLPClassifier(hidden_layer_sizes=(200, 200), verbose=True)
     log.logger.critical("model: \n{}".format(clf))
     clf = fitting(clf, train_images, train_labels)
     acc = evaluate(clf, val_images, val_labels, num_classes=10)
