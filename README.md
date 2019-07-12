@@ -1,15 +1,13 @@
 # MonkeyProject
-> Classification for an image dataset of 10 Monkey Species
+> An image classification challenge of 10 monkey species
 
 ## Introduction
 
-This project is an image classification task with a dataset consisting of monkey images of 10 species. The aim of this contest is to create a classifier to classify monkeys by 10 species. After training the training set data, the classifier model could be used to classify the types of monkeys according to the images of the monkeys in the test set. Finally, the accuracy of the classification prediction results on the test set will be used as the criterion to judge the classifier.
-
-The selected contest comes from：https://www.kaggle.com/slothkong/10-monkey-species
+This project is an image classification challenge from Kaggle, [10-monkey-species](https://www.kaggle.com/slothkong/10-monkey-species), with a dataset consisting of monkey images of 10 species. The aim of this contest is to create a classifier to classify monkeys by 10 species. After training the training set data, the classifier model can be used to classify the class of per monkeys according to the images of the monkeys in the validation set. Finally, the accuracy of the classification prediction results on the validation set will be used as the criterion to judge the classifier.
 
 ## Dataset
 
-The data set comes from image data provided by Kaggle's competition project. The dataset consists of two file, the training dataset and the test dataset. There are 10 classes of images in this dataset. The dataset consists of almost 1400 images, which are 400 x 300 px or lager in JPEG format.
+The dataset is provided by [10-monkey-species](https://www.kaggle.com/slothkong/10-monkey-species). The dataset consists of the training set and the validation set. There are 10 classes of images in this dataset. The dataset consists of almost 1400 images, which are colored ones of 400 x 300 px or lager in jpg format.
 
 The 10 species of monkeys are as follows：
 
@@ -41,5 +39,3 @@ abnormal data:
 * `File is not .jpg ./../10-monkey-species/training/n9/n9160.png`
 
   rename this file to `n9160.jpg`
-
-The size of the image with the shortest edge: 183
