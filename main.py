@@ -16,9 +16,11 @@ import torchvision.transforms as transforms
 import numpy as np
 
 # import the files of mine
-from models.alexnet import *
-from models.resnet import *
-from models.densenet import *
+from models.alexnet import alexnet
+from models.resnet import resnet34
+from models.densenet import densenet121
+from models.vgg import vgg16_bn
+from models.shufflenetv2 import shufflenetv2_x1_0
 
 import settings
 from settings import log
@@ -28,7 +30,7 @@ import utility.fitting
 import utility.load_dataset
 from utility.load_dataset import MonkeyDataset
 
-GPU_NOT_USE = [1, 3, 4]
+GPU_NOT_USE = [1, 3]
 
 # utility.load_dataset._init_json()   # print the paths and labels in json
 # utility.load_dataset.get_mean_std()
@@ -115,6 +117,10 @@ def get_model(_model_name, _num_classes):
         return alexnet(pretrained=settings.isPretrain, num_classes=num_classes)
     elif _model_name == 'densenet121':
         return densenet121(pretrained=settings.isPretrain, num_classes=num_classes)
+    elif _model_name == 'vgg16_bn':
+        return vgg16_bn(pretrained=settings.isPretrain, num_classes=num_classes)
+    elif _model_name == 'shufflenetv2_x1_0':
+        return shufflenetv2_x1_0(pretrained=settings.isPretrain, num_classes=num_classes)
     else:
         log.logger.error("model_name error!")
         exit(-1)

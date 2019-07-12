@@ -15,8 +15,11 @@ import datetime
 import logger
 
 ## setttings #############################################
-model_name = 'resnet34'
+# model_name = 'resnet34'
 # model_name = 'densenet121'
+model_name = 'alexnet'
+# model_name = 'vgg16_bn'
+# model_name = 'shufflenetv2_x1_0'
 
 isPretrain = False
 

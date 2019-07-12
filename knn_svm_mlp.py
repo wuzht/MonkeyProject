@@ -129,12 +129,23 @@ def perform_knn():
 
 
 def perform_svm():
+    best_acc = 0
+    best_params = None
+
     train_images, train_labels, val_images, val_labels = load_data()
     # kernel must be one of 'linear', 'poly', 'rbf', 'sigmoid'
-    clf = svm.SVC(gamma='scale', verbose=True, kernel='rbf')
-    log.logger.critical("model: \n{}".format(clf))
-    clf = fitting(clf, train_images, train_labels)
-    acc = evaluate(clf, val_images, val_labels, num_classes=10)
+    for degree in range(3, 21):
+        clf = svm.SVC(gamma='scale', verbose=True, kernel='poly', degree=degree)
+        log.logger.critical("model: \n{}".format(clf))
+        clf = fitting(clf, train_images, train_labels)
+        train_acc = evaluate(clf, train_images, train_labels, num_classes=10)
+        val_acc = evaluate(clf, val_images, val_labels, num_classes=10)
+
+        if val_acc > best_acc:
+            best_acc = val_acc
+            best_params = degree
+        log.logger.critical('train acc: {:.4f}%, val acc: {:.4f}%'.format(100 * train_acc, 100 * val_acc))
+        log.logger.critical('best_acc: {:.4f}%, best_params: {}'.format(100 * best_acc, best_params))
 
 
 def perform_mlp():

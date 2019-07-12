@@ -26,7 +26,7 @@ class VGG(nn.Module):
         super(VGG, self).__init__()
         self.features = features
         self.avgpool = nn.AdaptiveAvgPool2d((7, 7))
-        self.classifier = nn.Sequential(
+        self.classifier_ = nn.Sequential(
             nn.Linear(512 * 7 * 7, 4096),
             nn.ReLU(True),
             nn.Dropout(),
@@ -42,7 +42,7 @@ class VGG(nn.Module):
         x = self.features(x)
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
-        x = self.classifier(x)
+        x = self.classifier_(x)
         return x
 
     def _initialize_weights(self):
@@ -149,7 +149,12 @@ def vgg16(pretrained=False, **kwargs):
         kwargs['init_weights'] = False
     model = VGG(make_layers(cfg['D']), **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg16']))
+        # model.load_state_dict(model_zoo.load_url(model_urls['vgg16']))
+        pretrained_dict = model_zoo.load_url(model_urls['vgg16'])
+        model_dict = model.state_dict()
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+        model_dict.update(pretrained_dict)
+        model.load_state_dict(model_dict)
     return model
 
 
@@ -163,7 +168,12 @@ def vgg16_bn(pretrained=False, **kwargs):
         kwargs['init_weights'] = False
     model = VGG(make_layers(cfg['D'], batch_norm=True), **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg16_bn']))
+        # model.load_state_dict(model_zoo.load_url(model_urls['vgg16_bn']))
+        pretrained_dict = model_zoo.load_url(model_urls['vgg16_bn'])
+        model_dict = model.state_dict()
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+        model_dict.update(pretrained_dict)
+        model.load_state_dict(model_dict)
     return model
 
 
@@ -177,7 +187,12 @@ def vgg19(pretrained=False, **kwargs):
         kwargs['init_weights'] = False
     model = VGG(make_layers(cfg['E']), **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg19']))
+        # model.load_state_dict(model_zoo.load_url(model_urls['vgg19']))
+        pretrained_dict = model_zoo.load_url(model_urls['vgg19'])
+        model_dict = model.state_dict()
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+        model_dict.update(pretrained_dict)
+        model.load_state_dict(model_dict)
     return model
 
 
@@ -191,5 +206,11 @@ def vgg19_bn(pretrained=False, **kwargs):
         kwargs['init_weights'] = False
     model = VGG(make_layers(cfg['E'], batch_norm=True), **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg19_bn']))
+        # model.load_state_dict(model_zoo.load_url(model_urls['vgg19_bn']))
+        pretrained_dict = model_zoo.load_url(model_urls['vgg19_bn'])
+        model_dict = model.state_dict()
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+        model_dict.update(pretrained_dict)
+        model.load_state_dict(model_dict)
+
     return model
