@@ -9,11 +9,14 @@
 '''
 
 import os
+import io
+import sys
 os.environ['KMP_WARNINGS'] = 'off'
 
 import torch
 import torchvision.transforms as transforms
 import numpy as np
+from torchsummary import summary
 
 # import the files of mine
 from models.alexnet import alexnet
@@ -30,23 +33,11 @@ import utility.fitting
 import utility.load_dataset
 from utility.load_dataset import MonkeyDataset
 
-GPU_NOT_USE = [1, 3]
+GPU_NOT_USE = [1, 3, 4]
 
 # utility.load_dataset._init_json()   # print the paths and labels in json
 # utility.load_dataset.get_mean_std()
 # exit(-1)
-
-# create folders
-if not os.path.exists(settings.DIR_trained_model):
-    os.makedirs(settings.DIR_trained_model)
-if not os.path.exists(settings.DIR_logs):
-    os.makedirs(settings.DIR_logs)
-if not os.path.exists(settings.DIR_tblogs):
-    os.makedirs(settings.DIR_tblogs)
-if not os.path.exists(settings.DIR_confusions):
-    os.makedirs(settings.DIR_confusions)    
-if not os.path.exists(settings.DIR_confusion):
-    os.makedirs(settings.DIR_confusion)
 
 def choose_gpu():
     """
@@ -149,6 +140,17 @@ log.logger.critical("val_transform: \n{}".format(val_transform))
 log.logger.critical("optimizer: \n{}".format(optimizer))
 log.logger.critical("loss_func: \n{}".format(loss_func))
 log.logger.critical("model: \n{}".format(model))
+
+# torchsummary ###############
+old_stdout = sys.stdout # Memorize the default stdout stream
+sys.stdout = buffer = io.StringIO()
+
+summary(model=model.to("cuda" if torch.cuda.is_available() else "cpu"), input_size=(3, 224, 224), batch_size=batch_size)
+
+sys.stdout = old_stdout # Put the old stream back in place
+whatWasPrinted = buffer.getvalue() # Return a str containing the entire contents of the buffer.
+log.logger.critical("torchsummary: \n{}".format(whatWasPrinted))
+# torchsummary ###############
     
 log.logger.critical('Start training')
 utility.fitting.fit(model, num_epochs, optimizer, loss_func, device, train_loader, val_loader, num_classes, lr_decay_type)

@@ -1,5 +1,5 @@
 # MonkeyProject
-> An image classification challenge of 10 monkey species
+> An image classification challenge of 10 monkey sapecies
 
 ## Introduction
 

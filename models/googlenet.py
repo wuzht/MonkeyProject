@@ -38,7 +38,13 @@ def googlenet(pretrained=False, **kwargs):
         kwargs['aux_logits'] = True
         kwargs['init_weights'] = False
         model = GoogLeNet(**kwargs)
-        model.load_state_dict(model_zoo.load_url(model_urls['googlenet']))
+        # model.load_state_dict(model_zoo.load_url(model_urls['googlenet']))
+        pretrained_dict = model_zoo.load_url(model_urls['googlenet'])
+        model_dict = model.state_dict()
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+        model_dict.update(pretrained_dict)
+        model.load_state_dict(model_dict)
+
         if not original_aux_logits:
             model.aux_logits = False
             del model.aux1, model.aux2
@@ -80,7 +86,7 @@ class GoogLeNet(nn.Module):
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.dropout = nn.Dropout(0.2)
-        self.fc = nn.Linear(1024, num_classes)
+        self.fc_ = nn.Linear(1024, num_classes)
 
         if init_weights:
             self._initialize_weights()
@@ -151,7 +157,7 @@ class GoogLeNet(nn.Module):
         x = x.view(x.size(0), -1)
         # N x 1024
         x = self.dropout(x)
-        x = self.fc(x)
+        x = self.fc_(x)
         # N x 1000 (num_classes)
         if self.training and self.aux_logits:
             return _GoogLeNetOuputs(x, aux2, aux1)
@@ -197,7 +203,7 @@ class InceptionAux(nn.Module):
         self.conv = BasicConv2d(in_channels, 128, kernel_size=1)
 
         self.fc1 = nn.Linear(2048, 1024)
-        self.fc2 = nn.Linear(1024, num_classes)
+        self.fc2_ = nn.Linear(1024, num_classes)
 
     def forward(self, x):
         # aux1: N x 512 x 14 x 14, aux2: N x 528 x 14 x 14
@@ -211,7 +217,7 @@ class InceptionAux(nn.Module):
         # N x 2048
         x = F.dropout(x, 0.7, training=self.training)
         # N x 2048
-        x = self.fc2(x)
+        x = self.fc2_(x)
         # N x 1024
 
         return x
